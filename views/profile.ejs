@@ -5,8 +5,33 @@
 	<title>Node Authentication</title>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+	<link rel="stylesheet" href="style.css">
 	<style>
 		body 		{ padding-top:80px; word-wrap:break-word; }
+		.portfolio-item {
+		    margin-bottom: 30px;
+		}
+		.card {
+		    position: relative;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -ms-flex-direction: column;
+		    flex-direction: column;
+		    min-width: 0;
+		    word-wrap: break-word;
+		    background-color: #fff;
+		    background-clip: border-box;
+		    border: 1px solid rgba(0,0,0,.125);
+		    border-radius: .25rem;
+		}
+		.card-body {
+		    -ms-flex: 1 1 auto;
+		    flex: 1 1 auto;
+		    padding: 1.25rem;
+		}
+		.btn_circle{
+			margin-bottom: 5px;
+		}
 	</style>
 </head>
 <body>
@@ -20,22 +45,114 @@
 	<div class="row">
 
 		<!-- FACEBOOK INFORMATION -->
-		<div class="col-sm-6">
+		<div class="col-sm-6 basic_info">
 			<div class="well">
 				<h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
-
 					<p>
-						<strong>id</strong>: <%= user.facebook.id %><br>
-						<strong>token</strong>: <%= user.facebook.token %><br>
+						<strong>id</strong>: <span id="userId"><%= user.facebook.id %></span><br>
+						<strong>token</strong>:  <span id="userToken"><%= user.facebook.token %></span><br>
 						<strong>email</strong>: <%= user.facebook.email %><br>
 						<strong>name</strong>: <%= user.facebook.name %>
-					</p>
 
+					</p>
+					<a href="#" id="fetchFriends" class="btn btn-default btn-primary btn-sm">Fetch Friend List</a>
 			</div>
 		</div>
+
+		<section class="testimonials text-center bg-light ">
+      <div class="container well ">
+        <h2 class="mb-5">Ego Network...</h2>
+        <div class="row friendList">
+        </div>
+				<a id="clickPrevious" class="hide">Previous</a>
+				<a id="clickNext" class="hide">Next</a>
+
+      </div>
+    </section>
+
+
+
 
 	</div>
 
 </div>
+<script
+			  src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
+		<script>
+			 $(document).ready(function(){
+				 $('#fetchFriends').on('click',function(){
+					 var userId = $('#userId').text();
+					 var userToken = $('#userToken').text();
+					 getFriendList("https://graph.facebook.com/v2.11/"+userId+"/taggable_friends?access_token="+userToken+"&debug=all&format=json&method=get&pretty=0&suppress_http_code=1");
+					 console.log(userId,'User Token : ', userToken)
+					 alert('Its Time to Hit');
+
+				 });
+				 function getFriendList(url){
+					 $.get( url,
+					 function( result ) {
+						 // $( ".result" ).html( data );
+						 // alert( "Load was performed." );
+
+						 console.log(result.data);
+						 $('.basic_info').addClass('hide');
+						 if(result.paging.previous){
+							 $('#clickPrevious').removeClass('hide');
+							 $('#clickPrevious').attr('data-previous',result.paging.previous);
+							 attachPreviousEvent();
+						 }else{
+							 $('#clickPrevious').addClass('hide');
+						 }
+						 if(result.paging.next){
+							 $('#clickNext').removeClass('hide');
+							 $('#clickNext').attr('data-next',result.paging.next);
+							 attachNextEvent();
+						 }else{
+							 $('#clickNext').addClass('hide');
+						 }
+						 $('.friendList').html('');
+						 $.each(result.data,function(key,val){
+							 	var html = `
+								<div class="col-lg-4 col-sm-6 portfolio-item">
+				          <div class="card h-100">
+				            <a href="#"><img class="card-img-top" src="`+val.picture.data.url+`" alt=""></a>
+				            <div class="card-body">
+				              <h4 class="card-title">
+				                <a href="#">`+val.name+`</a>
+				              </h4>
+				              <p class="card-text">How do you know <b>`+val.name+`</b>?</p>
+											<button class="btn btn-primary btn_circle">School</button>
+											<button class="btn btn-primary btn_circle">High School</button>
+											<button class="btn btn-primary btn_circle">College</button>
+											<button class="btn btn-primary btn_circle">University</button>
+											<button class="btn btn-primary btn_circle">Job Colleague</button>
+				            </div>
+				          </div>
+				        </div>`;
+
+								$('.friendList').append(html);
+						 });
+						 //$('.friendList').html(result['data']);
+						});
+				 }
+
+				 function attachNextEvent(element){
+					 $('#clickNext').unbind('click');
+					 $('#clickNext').on('click',function(){
+						 var url = $(this).attr('data-next');
+						 getFriendList(url);
+					 })
+				 }
+				 function attachPreviousEvent(element){
+					 $('#clickPrevious').unbind('click');
+					 $('#clickPrevious').on('click',function(){
+						 var url = $(this).attr('data-previous');
+						 getFriendList(url);
+					 })
+				 }
+			 })
+		</script>
 </body>
 </html>
