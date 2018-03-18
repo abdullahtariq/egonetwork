@@ -1,5 +1,5 @@
 // app/routes.js
-module.exports = function(app, passport) {
+module.exports = function(app, passport, https,request) {
 
 	// =====================================
 	// HOME PAGE (with login links) ========
@@ -65,6 +65,35 @@ module.exports = function(app, passport) {
 			successRedirect : '/profile',
 			failureRedirect : '/'
 		}));
+
+	app.get('/getUserFbId',function(req,res){
+	 	console.log(req.query.id);
+		//console.log(https);
+		console.log('i need to hit the fb url');
+		var url = 'https://www.facebook.com/photo.php?fbid='+req.query.id;
+		request(url,
+		  {
+		    headers: {
+		      'user-agent': 'curl/7.47.0',
+		      'accept-language': 'en-US,en',
+		      'accept': '*/*'
+		    }
+		  }, function (error, response, body) {
+		    if (error) {
+		      throw (error);
+		    }
+		    if (response.statusCode === 200) {
+					var splitedA = response.body.split('set=a.');
+					//var splittedB = splitedA[2].split('&amp;');
+					console.log(splitedA[2]);
+		      //var result = scraper(body);
+		      //console.log(JSON.stringify(result, null, 2));
+		    } else {
+		      console.log('HTTP Error: ' + response.statusCode);
+		    }
+		});
+		//var url = 'https://www.facebook.com/photo.php?fbid='+profileImg;
+	})
 
 	// =====================================
 	// LOGOUT ==============================

@@ -8,8 +8,10 @@ var port     = process.env.PORT || 8080;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
-
+var https    = require('https');
 var configDB = require('./config/database.js');
+var request = require('request');
+//var scraper = require('facebook-nologin-scraper');
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -34,7 +36,9 @@ app.configure(function() {
 });
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./app/routes.js')(app, passport, https,request); // load our routes and pass in our app and fully configured passport
+
+
 
 // launch ======================================================================
 app.listen(port);

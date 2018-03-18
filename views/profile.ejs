@@ -74,7 +74,6 @@
 
 
 	</div>
-
 </div>
 <script
 			  src="https://code.jquery.com/jquery-3.2.1.min.js"
@@ -133,6 +132,7 @@
 				        </div>`;
 
 								$('.friendList').append(html);
+								getFriendId();
 						 });
 						 //$('.friendList').html(result['data']);
 						});
@@ -152,6 +152,34 @@
 						 getFriendList(url);
 					 })
 				 }
+				 function getFriendId(element){
+					 $('.card-title').unbind('click');
+					 $('.card-title').on('click',function(event){
+						 	var imgSrc = $(this).parents('.card').find('.card-img-top').attr('src');
+							profileImg = imgSrc.split('_')[1];
+							var url = 'getUserFbId/?id='+profileImg;
+
+
+						 // $.ajax({
+							//   url: url,
+							//   success: function(result){
+							// 		debugger;
+							// 		console.log(result);
+							// 	},
+							//   dataType: 'html'
+							// });
+
+							$.get( url, function( data ) {
+								  $( "body" )
+								    .append( "Time: " + data ); //  2pm
+										debugger;
+								}, "html" );
+							//$('#target_id_user').attr('src','http://facebook.com/'+profileImg);
+							// debugger;
+							event.stopPropagation();
+					 })
+				 }
+
 			 })
 		</script>
 </body>
